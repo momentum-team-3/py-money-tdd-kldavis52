@@ -1,4 +1,5 @@
 # pylint: disable=unidiomatic-typecheck,unnecessary-pass
+from decimal import Decimal
 
 
 class DifferentCurrencyError(Exception):
@@ -18,13 +19,17 @@ class Currency:
         - symbol - optional symbol used to designate currency
         - digits -- number of significant digits used
         """
-        pass
+        self.name = name
+        self.code = code
+        self.symbol = symbol
+        self.digits = digits
 
     def __str__(self):
         """
         Should return the currency code, or code with symbol in parentheses.
         """
-        pass
+        # return f'{self.code}({self.symbol})'
+        return f'{self.code}'
 
     def __eq__(self, other):
         """
@@ -46,14 +51,19 @@ class Money:
         - amount -- quantity of currency
         - currency -- type of currency
         """
-        pass
+        self.amount = amount
+        self.currency = currency
 
     def __str__(self):
         """
         Should use the currency symbol if available, else use the code.
         Use the currency digits to determine number of digits to show.
         """
-        pass
+        self.money = Currency(self.amount, self.currency)
+        if self.currency == 'USD':
+            self.money.symbol = '$'
+            return f'{self.money.symbol}{float(self.amount)}{"0"}'
+        return f'{self.money.code} {float(self.amount)}{"0"*self.money.digits}'
 
     def __repr__(self):
         return f"<Money {str(self)}>"
@@ -66,12 +76,15 @@ class Money:
         return (type(self) == type(other) and self.amount == other.amount and
                 self.currency == other.currency)
 
-    def add(self, other):
+    def __add__(self, other):
         """
         Add two money objects of the same currency. If they have different
         currencies, raise a DifferentCurrencyError.
         """
-        pass
+        if self.currency != other.currency:
+            raise DifferentCurrencyError(
+                'Currencies must be identical to add values')
+        return
 
     def sub(self, other):
         """
